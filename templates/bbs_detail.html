@@ -1,0 +1,39 @@
+{% extends 'index.html' %}
+{% load comments %}
+
+{% block page-content %}
+    <div class="contents">
+    <h2>{{ bbs_obj.title }}</h2>
+        {{ bbs_obj.content|safe }}
+    </div>
+    <hr/>
+
+    <div class="comments">
+        <div>
+            {% get_comment_count for bbs_obj as comment_count %}
+                <span class="glyphicon glyphicon-comment"></span>
+            {{ comment_count }}条评论
+        </div>
+        <br/>
+
+        {% if user.is_authenticated %}
+            <form action="/sub_comment/" method="post">
+                {% csrf_token %}
+                <textarea cols="80" rows="3" name="comment_content"></textarea>
+                <input type="hidden" name="bbs_id" value="{{ bbs_obj.id }}">
+                <br/>
+                <input type="submit" value="提交评论" id="id_submit">
+            </form>
+        {% else %}
+            <p>请<a href="/login/">登陆</a>后评论</p>
+        {% endif %}
+
+        {% get_comment_list for bbs_obj as comment_list %}
+        {% for comment in comment_list reversed %}
+            {{ comment.submit_date }}
+            <br/>
+            {{ comment.comment }}
+            <hr>
+        {% endfor %}
+    </div>
+{% endblock %}
